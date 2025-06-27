@@ -3,11 +3,6 @@
 
 import os
 
-# --- 并行化配置 ---
-# 安全地获取CPU核心数，并设置工作进程数
-# A safe way to get CPU count, and set the number of workers
-cpu_count = os.cpu_count()
-num_workers = int(cpu_count * 0.55) if cpu_count and cpu_count > 2 else 2 # 使用更多核心
 
 class dotdict(dict):
     """dot.notation access to dictionary attributes"""
@@ -25,16 +20,16 @@ args = dotdict({
     # ======================================================================================
     # === 高质量与速度均衡配置 (Balanced Quality & Speed) ===
     # ======================================================================================
-    'num_iterations': 200,          # 总的"自我对弈-训练-评估"循环次数 (可以保持不变或根据需要增加)
-    'num_eps': 44,                  # 每次迭代中进行的自我对弈局数 (适当增加以获得更多样化的数据)
-    'num_workers': num_workers,     # 并行执行自我对弈的工作进程数
+    'num_iterations': 2000,          # 总的"自我对弈-训练-评估"循环次数 (可以保持不变或根据需要增加)
+    'num_eps': 40,                  # 每次迭代中进行的自我对弈局数 (适当增加以获得更多样化的数据)
+    'num_workers': 8,               # 并行执行自我对弈的工作进程数
     'temp_threshold': 15,           # 在自我对弈的前15步，使用温度参数tau=1以鼓励探索 (保持不变)
     'update_threshold': 0.55,       # 新模型取代旧模型所需的胜率阈值 
-    'max_len_of_queue': 200000,     # 经验回放池的最大长度 (增加以容纳更多历史数据，防止遗忘)
-    'num_mcts_sims': 800,           # 每一步棋执行的MCTS模拟次数 (保持不变，这是高质量数据的保证)
-    'mcts_batch_size': 256,          # MCTS批量预测时的批次大小
-    'arena_compare': 44,            # 在竞技场中比较新旧模型的比赛局数 (增加对局数，减少随机性)
-    'arena_num_mcts_sims': 400,     # Arena对战时的MCTS模拟次数 (***核心修正***: 必须与训练时的模拟次数相同)
+    'max_len_of_queue': 700000,     # 经验回放池的最大长度 (增加以容纳更多历史数据，防止遗忘)
+    'num_mcts_sims': 500,           # 每一步棋执行的MCTS模拟次数 (保持不变，这是高质量数据的保证)
+    'mcts_batch_size': 64,            # MCTS批量预测时的批次大小
+    'arena_compare': 40,            # 在竞技场中比较新旧模型的比赛局数 (增加对局数，减少随机性)
+    'arena_num_mcts_sims': 500,     # Arena对战时的MCTS模拟次数 (***核心修正***: 必须与训练时的模拟次数相同)
     'cpuct': 1.5,                   # PUCT公式中的探索常数 (稍微降低，在网络变强后可以更相信其策略)
     'dirichlet_alpha': 0.3,         # 用于为根节点策略添加探索噪声的Dirichlet分布的alpha参数
     'noise_epsilon': 0.25,          # 噪声在根节点策略中所占的比例
@@ -46,7 +41,7 @@ args = dotdict({
     'n': 7,  # 棋盘大小
 
     # 神经网络参数
-    'lr': 0.00005,                   # Adam优化器的学习率 (***核心修正***: 大幅降低以匹配更稳定的训练)
+    'lr': 0.001,                   # Adam优化器的学习率 (***核心修正***: 大幅降低以匹配更稳定的训练)
     'dropout': 0.3,                  # Dropout比率
     'epochs': 1,                     # 每次迭代中，对采样出的训练数据进行的训练轮数 (***核心修正***: 改为1，防止过拟合)
     'batch_size': 128,               # 训练时的批次大小 (在GPU显存允许的情况下可以增大，以获得更稳定的梯度)
